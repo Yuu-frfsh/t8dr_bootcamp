@@ -34,14 +34,14 @@ export default function TopBar() {
         aria-label="نص حر للنطق"
         enterKeyHint="send"
         autoComplete="off"
-        className="min-w-0 flex-1 rounded-2xl border-2 border-border bg-surface px-4 text-xl outline-none focus:border-text"
+        className="min-w-0 flex-1 rounded-2xl border-2 border-border bg-surface px-4 text-xl outline-none focus:border-primary"
         style={{ minHeight: '88px' }}
       />
       <button
         type="submit"
         disabled={!value.trim()}
         aria-label="نطق النص"
-        className="flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-text px-5 text-xl font-bold text-white transition-opacity active:scale-95 disabled:opacity-30"
+        className="flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-xl font-bold text-primary-reverse transition-opacity active:scale-95 active:bg-primary-dark disabled:opacity-30"
         style={{ minHeight: '88px', minWidth: '88px' }}
       >
         <Volume2 size={30} aria-hidden="true" />

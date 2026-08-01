@@ -3,35 +3,35 @@
     "id": "help",
     "label_ar": "مساعدة",
     "label_en": "Help",
-    "color": "#DB2777",
+    "color": "#B0417A",
     "icon": "hand"
   },
   {
     "id": "understand",
     "label_ar": "فهم",
     "label_en": "Understanding",
-    "color": "#2563EB",
+    "color": "#3F6FB5",
     "icon": "brain"
   },
   {
     "id": "tech",
     "label_ar": "تقنية",
     "label_en": "Tech",
-    "color": "#7C3AED",
+    "color": "#6B4E9E",
     "icon": "cpu"
   },
   {
     "id": "needs",
     "label_ar": "احتياجات",
     "label_en": "Needs",
-    "color": "#EA580C",
+    "color": "#C06A2E",
     "icon": "coffee"
   },
   {
     "id": "social",
     "label_ar": "تواصل",
     "label_en": "Social",
-    "color": "#0D9488",
+    "color": "#2F8C7A",
     "icon": "users"
   }
 ]

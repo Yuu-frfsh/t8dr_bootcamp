@@ -19,11 +19,16 @@ Phases 1–3 of SPEC section 12 are built:
 | 1 | Core — cards, `useSpeak`, `BigTextOverlay`, `WaveEffect` | ✅ |
 | 2 | Navigation — chips, search, recents, favorites | ✅ |
 | 3 | Free text + raise hand + `api/speak.js` | ✅ |
-| 4 | Assets — `scripts/tts.js`, sign filming, `SignPlayer` | ⬜ not started |
+| 4 | Assets — `scripts/encode-signs.mjs` ✅, `scripts/tts.js` ✅, sign filming ⬜, `SignPlayer` ⬜ | 🟨 |
 | 5 | Polish — PWA, `SettingsSheet`, Vercel deploy | ⬜ not started |
 
-The app is **fully usable right now with zero sign clips and zero audio files.**
-That is a designed state, not a placeholder — see principle 5 in the spec.
+Audio is real: 30 Azure-generated MP3s ship in `public/audio`. Signs are not —
+the clips currently in `public/signs` are one sample repeated, so **every card
+shows the same sign**. Film them, or run `--clean-sample`, before this goes in
+front of a participant.
+
+The app is **fully usable with zero sign clips and zero audio files.** That is a
+designed state, not a placeholder — see principle 5 in the spec.
 
 ---
 
@@ -44,12 +49,65 @@ npm run build   # production build to dist/
 npm run preview # serve the production build
 ```
 
+```bash
+npm run tts            # generate any missing /public/audio/<id>.mp3 via Azure
+npm run tts -- --force # regenerate everything, after editing phrase wording
+npm run tts -- --dry   # list what would be generated, call nothing
+```
+
 ### Expected console noise in dev
 
-Tapping the free-text speak button logs a failed `POST /api/speak`. That is
-correct: `vite dev` has no serverless runtime and there is no `AZURE_KEY` yet, so
-the request fails and the app degrades to `window.speechSynthesis`. Missing
-`/signs/<id>.webp` requests 404 for the same reason. Neither is a bug.
+Missing `/signs/<id>.webp` requests 404 until sign clips are filmed. That is not
+a bug — the card falls back to a solid category block.
+
+`vite dev` has no serverless runtime, so `scripts/dev-api.js` mounts the real
+`api/speak.js` as middleware. On boot it prints either `Azure TTS configured` or
+`no AZURE_KEY - free text will use the device voice`. Without a key the free text
+bar logs a failed `POST /api/speak` and degrades to `window.speechSynthesis`,
+which is a supported state.
+
+---
+
+## Sign clips
+
+`scripts/encode-signs.mjs` produces the three files a card can use, per phrase id:
+
+| File | Size | Used by |
+|---|---|---|
+| `public/signs/<id>.webp` | 240×240, 12fps, animated | the grid card — rendered as `<img>` |
+| `public/signs/<id>.mp4` | 720×720 | `SignPlayer` (phase 4) |
+| `public/signs/<id>.jpg` | first frame | the "freeze motion" setting (phase 5) |
+
+ffmpeg comes from the `ffmpeg-static` devDependency — there is nothing to install
+by hand. This script replaces the `encode-signs.sh` in SPEC section 9, which
+assumes a POSIX shell and a system ffmpeg; neither exists on Windows.
+
+```bash
+npm run signs                              # raw/<id>.mov  ->  public/signs/<id>.*
+npm run signs -- --only need_help          # just one id
+npm run signs -- --force                   # re-encode instead of skipping
+```
+
+Filename in `raw/` **is** the phrase id. Encoding is idempotent, so re-running
+after filming three more signs only encodes those three.
+
+### Filling every card with one placeholder clip
+
+Before the real signs are filmed, one sample clip can stand in everywhere, so the
+grid can be tested at full density:
+
+```bash
+npm run signs -- --sample path/to/clip.mp4   # every id in phrases.json
+npm run signs -- --clean-sample              # remove exactly those files again
+```
+
+`--sample` encodes once and copies, and it will **not** overwrite a real encoded
+clip — so a partly-filmed set can be topped up with placeholders. What it wrote is
+recorded in `public/signs/.sample-manifest.json`, and `--clean-sample` deletes
+exactly that list and nothing else.
+
+These placeholders are ~6 MB of the same clip repeated. Run `--clean-sample`
+before committing.
 
 ---
 
@@ -67,7 +125,7 @@ speaking at a time, three tiers:
 Two rules matter more than the rest, and both exist because **the user cannot
 hear the output**:
 
-- **Status comes from real media events only** (`play`, `ended`, `error`,
+- **Status comes from real media events only** (`playing`, `ended`, `error`,
   `stalled`, `onstart`, `onend`, `onerror`). Never from a timer. A card that
   animated "playing" on a `setTimeout` would be lying to someone who has no way
   to check.
@@ -116,10 +174,14 @@ Category colors live in `categories.json` (not in `tailwind.config.js`) so they
 can be changed without touching code, and the order of that file sets the order
 categories appear in the chips and in the "all" grid.
 
-Current content is a **~16 entry stub**. The real phrase list is written with the
-participants — build against the schema, not against these samples.
+Current content is **30 real bootcamp phrases**. Colloquial spellings are on the
+cards (`الحين`, `وش`, `هالنقطة`) with MSA equivalents in `keywords`, so search
+finds a card either way.
 
-When you write the real list: transliterate technical terms into Arabic script
+After editing wording, re-run `npm run tts -- --force` — otherwise the card still
+plays the MP3 of the old sentence.
+
+When you extend the list: transliterate technical terms into Arabic script
 (`الأردوينو`, not `Arduino`), and do not add harakat by default — generate the
 audio plain, listen once, and add harakat only to the few that come out wrong.
 
@@ -141,15 +203,52 @@ scripts/          copy-fonts.mjs
 
 ---
 
-## Azure (not yet configured)
+## Azure
 
-`api/speak.js` gives typed free text the same Saudi voice as the cards. Until
-`AZURE_KEY` / `AZURE_REGION` exist it returns `503` and the client falls through
-to `speechSynthesis` — a supported state, not an outage.
+Two consumers, one voice table (`lib/tts.js`) so they cannot drift apart:
 
-To enable: copy `.env.example` to `.env` locally, and set the same two variables
-in the Vercel project settings. **Never prefix them with `VITE_`** — that would
-inline the key into the client bundle.
+| | what | when |
+|---|---|---|
+| `scripts/tts.js` | writes `/public/audio/<id>.mp3` | once, at your desk |
+| `api/speak.js` | synthesises typed free text on demand | at tap time |
+
+The MP3s **are committed**. The deploy has no Azure key, the venue wifi is
+expected to die, and re-synthesising per build would let the audio drift from
+what was tested. 30 phrases ≈ 570kB.
+
+Cards therefore never touch the network: measured, a card reaches the `playing`
+event ~80ms after the tap, versus ~700ms when it has to fall through the
+missing-file deadline to the device voice. That gap matters beyond latency —
+audio that starts inside the tap keeps the user-gesture context, which is what
+Safari requires.
+
+`AZURE_KEY` / `AZURE_REGION` live in `.env` locally (gitignored) and in the
+Vercel project settings for the deploy. **Never prefix them with `VITE_`** —
+that would inline the key into the client bundle. Absent them, `api/speak.js`
+returns `503` and the client falls through to `speechSynthesis`.
+
+---
+
+## Colour
+
+Camp host brand, in `tailwind.config.js`:
+
+| token | hex | used for |
+|---|---|---|
+| `primary` | `#7D63AB` | speak button, active chip, free-text overlay, waves |
+| `primary-dark` | `#573D85` | pressed states, raise-hand, focus ring |
+| `primary-light` | `#A389D1` | — |
+| `primary-reverse` | `#FFFFFF` | text on any of the above |
+
+**`danger` (`#DC2626`) is reserved for "the audio did not work" and nothing
+else.** Not urgency, not emphasis, not a category. A user who cannot hear the
+output reads a red screen as failure, so a second meaning on that colour is one
+too many. `searchIndex.test.js` fails the build if a category is painted with it;
+the raise-hand button is brand purple for the same reason.
+
+Category colours in `categories.json` stay five distinguishable hues rather than
+five purples — telling categories apart at a glance is a function, not a
+decoration — but they are tuned to sit in the brand's tonal family.
 
 ---
 
@@ -166,8 +265,7 @@ on that request producing an honest 404.
 
 ## Next (phase 4)
 
-1. `scripts/tts.js` — generate `/public/audio/<id>.mp3` from `phrases.json`,
-   idempotent, post-processed with ffmpeg for a noisy lab.
+1. ~~`scripts/tts.js`~~ — done; 30 files in `public/audio`.
 2. Film the signs to the standard in SPEC section 9 — **never crop the face**;
    eyebrows, mouth shape and head tilt are grammar, not expression.
 3. `scripts/encode-signs.sh` → `.webp` + `.mp4` + `.jpg` per id. Requires

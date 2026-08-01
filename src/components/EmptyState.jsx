@@ -9,7 +9,7 @@ export default function EmptyState({ onClear }) {
       <button
         type="button"
         onClick={onClear}
-        className="rounded-2xl bg-text px-8 text-xl font-bold text-white active:scale-95"
+        className="rounded-2xl bg-primary px-8 text-xl font-bold text-primary-reverse active:scale-95 active:bg-primary-dark"
         style={{ minHeight: '88px' }}
       >
         مسح التصفية

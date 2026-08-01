@@ -5,7 +5,7 @@
  * comes from a real `play` event. It is never mounted on a timer - that is what
  * makes it truthful for a user who cannot hear the output.
  */
-export default function WaveEffect({ color = '#18181B' }) {
+export default function WaveEffect({ color = '#7D63AB' }) {
   return (
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-24 overflow-hidden"

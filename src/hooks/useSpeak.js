@@ -248,7 +248,7 @@ export function useSpeakEngine() {
         id: target.id,
         text_ar: target.text_ar,
         text_en: target.text_en || '',
-        color: target.color || '#18181B',
+        color: target.color || '#7D63AB',
         status: 'idle',
       });
       setActiveId(target.id);
@@ -494,7 +494,8 @@ export function useSpeakEngine() {
         id: FREE_TEXT_ID,
         text_ar: trimmed,
         text_en: '',
-        color: '#18181B',
+        // Free text has no category, so it wears the brand colour.
+        color: '#7D63AB',
         lang: detectLang(trimmed),
       });
     },

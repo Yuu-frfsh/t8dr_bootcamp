@@ -13,6 +13,11 @@ const COOLDOWN_MS = 3000;
  *
  * The 3 second cooldown exists for the same reason: with no audible feedback,
  * an uncertain user will otherwise tap it ten times.
+ *
+ * Brand purple, not red: red means "the audio did not work" everywhere else in
+ * this app, and the raise-hand flash is a full-screen transient exactly like a
+ * failure overlay. Two different meanings on the same colour is one too many
+ * for a user who cannot hear which one happened.
  */
 export default function RaiseHandButton() {
   const [waiting, setWaiting] = useState(false);
@@ -44,7 +49,7 @@ export default function RaiseHandButton() {
     <>
       {flashing ? (
         <div
-          className="flash-screen pointer-events-none fixed inset-0 z-[70] bg-danger"
+          className="flash-screen pointer-events-none fixed inset-0 z-[70] bg-primary"
           onAnimationEnd={() => setFlashing(false)}
           aria-hidden="true"
         />
@@ -58,7 +63,7 @@ export default function RaiseHandButton() {
         aria-pressed={waiting}
         className={[
           'fixed bottom-6 end-6 z-[65] flex items-center justify-center rounded-full',
-          'bg-danger text-white shadow-2xl ring-4 ring-white transition-opacity',
+          'bg-primary-dark text-primary-reverse shadow-2xl ring-4 ring-white transition-opacity',
           'active:scale-95 disabled:opacity-40',
           waiting && !cooling ? 'hand-waiting' : '',
         ].join(' ')}
@@ -69,7 +74,7 @@ export default function RaiseHandButton() {
 
       {waiting ? (
         <span
-          className="pointer-events-none fixed bottom-2 end-2 z-[66] rounded-full bg-danger px-3 py-1 text-sm font-bold text-white shadow-lg"
+          className="pointer-events-none fixed bottom-2 end-2 z-[66] rounded-full bg-primary-dark px-3 py-1 text-sm font-bold text-primary-reverse shadow-lg"
           role="status"
         >
           بانتظار المدرب

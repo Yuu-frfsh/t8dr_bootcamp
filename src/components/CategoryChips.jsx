@@ -9,7 +9,7 @@ import { LayoutGrid } from 'lucide-react';
  */
 export default function CategoryChips({ categories, active, onChange }) {
   const chips = [
-    { id: ALL_CATEGORY, label_ar: 'الكل', color: '#18181B', Icon: LayoutGrid },
+    { id: ALL_CATEGORY, label_ar: 'الكل', color: '#7D63AB', Icon: LayoutGrid },
     ...categories.map((c) => ({ ...c, Icon: iconFor(c.icon) })),
   ];
 

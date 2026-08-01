@@ -173,7 +173,8 @@ Fires on every speak action, presets and free text alike.
 - Auto-detect script: if the string contains Arabic Unicode range characters → Arabic voice; else English voice.
 - One large speak button.
 - Speaking also triggers `BigTextOverlay`.
-- **No save, no history, no persistence.** Clears on speak.
+- **The text persists after speaking.** It is cleared only by an explicit X inside the field, never automatically — same reasoning as the raise-hand waiting state below. The user cannot hear whether the sentence landed, so repeating it must cost one tap, not a retype.
+- **No save, no history, no persistence.** Nothing survives a reload.
 
 ### `RaiseHandButton`
 

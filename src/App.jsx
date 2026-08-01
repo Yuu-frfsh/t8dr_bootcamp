@@ -4,7 +4,8 @@ import categories from './data/categories.json';
 import { SpeakProvider } from './context/SpeakContext.jsx';
 import { useSpeak, FREE_TEXT_ID } from './hooks/useSpeak.js';
 import { useRecents, resolveIds } from './hooks/useRecents.js';
-import { filterPhrases, ALL_CATEGORY } from './utils/searchIndex.js';
+import { filterPhrases, ALL_CATEGORY, FAVORITES_CATEGORY } from './utils/searchIndex.js';
+import BrandHeader from './components/BrandHeader.jsx';
 import TopBar from './components/TopBar.jsx';
 import CategoryChips from './components/CategoryChips.jsx';
 import SearchBar from './components/SearchBar.jsx';
@@ -34,9 +35,21 @@ function Screen() {
     }
   }, [status, activeId, pushRecent]);
 
-  const visible = useMemo(() => filterPhrases(phrases, query, category), [query, category]);
+  // Unstarring the last card removes the favorites pill from the row. Deriving
+  // the active filter rather than storing it means the view falls back to "all"
+  // in the same render, instead of briefly showing an empty grid under a chip
+  // that is no longer on screen.
+  const hasFavorites = favorites.length > 0;
+  const activeCategory =
+    category === FAVORITES_CATEGORY && !hasFavorites ? ALL_CATEGORY : category;
+
+  const visible = useMemo(
+    () => filterPhrases(phrases, query, activeCategory, favorites),
+    [query, activeCategory, favorites]
+  );
 
   const searching = query.trim().length > 0;
+  const filteringFavorites = activeCategory === FAVORITES_CATEGORY;
   const recentPhrases = useMemo(() => resolveIds(recents, byId), [recents]);
   const favoritePhrases = useMemo(() => resolveIds(favorites, byId), [favorites]);
 
@@ -47,15 +60,25 @@ function Screen() {
 
   return (
     <div className="min-h-screen bg-bg">
+      <BrandHeader />
+
       <header className="sticky top-0 z-40 bg-bg shadow-sm">
         <TopBar />
-        <CategoryChips categories={categories} active={category} onChange={setCategory} />
+        <CategoryChips
+          categories={categories}
+          active={activeCategory}
+          onChange={setCategory}
+          hasFavorites={hasFavorites}
+        />
         <SearchBar value={query} onChange={setQuery} />
       </header>
 
       {!searching ? (
         <RecentRow
-          favorites={favoritePhrases}
+          // The grid below IS the favorites list while that filter is on;
+          // repeating it in a scroller directly above costs a screen of height
+          // and says nothing new.
+          favorites={filteringFavorites ? [] : favoritePhrases}
           recents={recentPhrases}
           categoriesById={categoriesById}
         />

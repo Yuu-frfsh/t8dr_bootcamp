@@ -252,7 +252,28 @@ the raise-hand button is brand purple for the same reason.
 
 Category colours in `categories.json` stay five distinguishable hues rather than
 five purples — telling categories apart at a glance is a function, not a
-decoration — but they are tuned to sit in the brand's tonal family.
+decoration — but they are tuned to sit in the brand's tonal family. Each card
+repeats its category as a small coloured badge beside the Arabic caption, so the
+category survives once real sign clips replace the solid colour block.
+
+### The header
+
+`BrandHeader.jsx` renders the تقدر logo and «معسكر تقدر للروبوتات».
+
+`public/logo.png` is the host mark, cropped from `Ucan_logo.avif` to its content
+box (197×70) and converted to PNG — AVIF has no decoder on iOS below 16, and the
+venue's tablets are an unknown quantity. Replacing that file is the whole
+update path; if it ever goes missing the header renders the host name as text.
+
+The bar is **white** and deliberately **not sticky**. It sits directly above a
+white sticky bar, and a coloured slab there competed with the cards; colour
+belongs on the things that do something. The stack below it (free text, chips,
+search) already owns ~270 px on a phone, which is most of the fold, so branding
+scrolls away and gives that height back to the cards.
+
+The name **wraps, it does not truncate.** At 360 px — an ordinary Android width
+— one line clipped it to «معسكر تقدر للروبو…», and the name is the one thing
+this bar exists to say.
 
 ---
 

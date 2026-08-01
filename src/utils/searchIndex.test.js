@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterPhrases, sortPhrases, ALL_CATEGORY } from './searchIndex.js';
+import { filterPhrases, sortPhrases, ALL_CATEGORY, FAVORITES_CATEGORY } from './searchIndex.js';
 import phrases from '../data/phrases.json';
 import categories from '../data/categories.json';
 
@@ -72,6 +72,42 @@ describe('filterPhrases', () => {
 
   it('ignores case and surrounding whitespace', () => {
     expect(ids(filterPhrases(fixture, '  BATTERY  '))).toContain('gamma');
+  });
+});
+
+describe('the favorites pseudo-category', () => {
+  it('keeps only starred phrases, ignoring their real category', () => {
+    const result = ids(filterPhrases(fixture, '', FAVORITES_CATEGORY, ['gamma', 'delta']));
+    expect(result).toEqual(['gamma', 'delta']);
+  });
+
+  it('still sorts by category then priority rather than by star order', () => {
+    // 'delta' was starred first but 'gamma' is in an earlier category, so the
+    // grid must not reorder itself around when the user starred things.
+    const result = ids(filterPhrases(fixture, '', FAVORITES_CATEGORY, ['delta', 'gamma']));
+    expect(result).toEqual(['gamma', 'delta']);
+  });
+
+  it('ANDs with the search query', () => {
+    expect(ids(filterPhrases(fixture, 'battery', FAVORITES_CATEGORY, ['gamma', 'delta']))).toEqual([
+      'gamma',
+    ]);
+    expect(filterPhrases(fixture, 'battery', FAVORITES_CATEGORY, ['delta'])).toHaveLength(0);
+  });
+
+  it('drops ids whose phrase no longer exists', () => {
+    // phrases.json is edited between sessions; a stale favorite must not throw.
+    expect(ids(filterPhrases(fixture, '', FAVORITES_CATEGORY, ['gamma', 'deleted_id']))).toEqual([
+      'gamma',
+    ]);
+  });
+
+  it('returns nothing when there are no favorites', () => {
+    expect(filterPhrases(fixture, '', FAVORITES_CATEGORY, [])).toHaveLength(0);
+  });
+
+  it('does not affect the other filters when favorites are passed', () => {
+    expect(ids(filterPhrases(fixture, '', 'help', ['gamma']))).toEqual(['alpha', 'beta']);
   });
 });
 

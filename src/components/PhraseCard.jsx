@@ -15,6 +15,12 @@ import WaveEffect from './WaveEffect.jsx';
  * The favorite button is a SIBLING of the card button rather than a child:
  * nested <button> elements are invalid HTML, and siblings give the same
  * "tapping the star does not speak" behaviour with no event plumbing.
+ *
+ * It sits over the sign area, not over the caption. Anchored to the bottom it
+ * collided with the English line on every phrase long enough to wrap, and the
+ * fix cannot be "shrink it until it fits" - the collision comes back the moment
+ * someone adds a longer phrase. The sign area is the one region of the card
+ * whose height never depends on the text.
  */
 /**
  * Length-based sizing, deterministic like the overlay's - no measure-and-reflow.
@@ -98,17 +104,36 @@ export default function PhraseCard({
         </div>
 
         <div className="flex flex-1 flex-col justify-center px-3 py-3">
-          <span
-            className={`font-bold leading-tight ${textStyle.cls}`}
-            style={{
-              display: 'block',
-              transform: state === 'playing' ? `scale(${textStyle.scale})` : 'scale(1)',
-              transformOrigin: 'right center',
-              transition: 'transform 120ms ease-out',
-            }}
-          >
-            {phrase.text_ar}
-          </span>
+          {/* items-start keeps the badge on the first line of a phrase that
+              wraps to three; shrink-0 stops it collapsing when the text is long. */}
+          <div className="flex items-start gap-2">
+            <span
+              className={`mt-0.5 flex shrink-0 items-center justify-center rounded-md ${
+                isCompact ? 'h-5 w-5' : 'h-6 w-6'
+              }`}
+              style={{ backgroundColor: color }}
+              role="img"
+              aria-label={category ? `الفئة: ${category.label_ar}` : undefined}
+            >
+              <Icon
+                size={isCompact ? 13 : 16}
+                strokeWidth={2.4}
+                color={readableTextOn(color)}
+                aria-hidden="true"
+              />
+            </span>
+            <span
+              className={`min-w-0 font-bold leading-tight ${textStyle.cls}`}
+              style={{
+                display: 'block',
+                transform: state === 'playing' ? `scale(${textStyle.scale})` : 'scale(1)',
+                transformOrigin: 'right center',
+                transition: 'transform 120ms ease-out',
+              }}
+            >
+              {phrase.text_ar}
+            </span>
+          </div>
           {phrase.text_en ? (
             <span className={`mt-1 text-muted ${isCompact ? 'text-xs' : 'text-sm'}`} dir="ltr">
               {phrase.text_en}
@@ -132,10 +157,10 @@ export default function PhraseCard({
           onClick={() => onToggleFavorite(phrase.id)}
           aria-label={isFavorite ? `إزالة ${phrase.text_ar} من المفضلة` : `إضافة ${phrase.text_ar} إلى المفضلة`}
           aria-pressed={isFavorite}
-          className="absolute bottom-2 end-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-border active:scale-90"
+          className="absolute top-2 end-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-border backdrop-blur-sm active:scale-90"
         >
           <Star
-            size={24}
+            size={20}
             strokeWidth={2}
             className={isFavorite ? 'text-amber-500' : 'text-muted'}
             fill={isFavorite ? 'currentColor' : 'none'}

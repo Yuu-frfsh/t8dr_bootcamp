@@ -2,6 +2,13 @@ import { normalizeArabic } from './normalizeArabic.js';
 import categories from '../data/categories.json';
 
 export const ALL_CATEGORY = 'all';
+/**
+ * A pseudo-category so favorites live on the same single-select axis as the
+ * real chips. One filter at a time is one less thing to reason about, and it
+ * means "show me my starred cards" costs exactly one tap like every other
+ * filter rather than introducing a second, differently-behaving control.
+ */
+export const FAVORITES_CATEGORY = 'favorites';
 const DEFAULT_PRIORITY = 99;
 
 // Category order comes from categories.json, so reordering that file reorders
@@ -51,15 +58,23 @@ export function sortPhrases(phrases) {
  * Category chip and search query combine with AND.
  * Every query token must appear somewhere in the phrase's normalized blob, so
  * multi-word queries narrow rather than widen.
+ *
+ * `favoriteIds` is only read when the favorites chip is the active filter, so
+ * callers that do not care about favorites can keep passing three arguments.
  */
-export function filterPhrases(phrases, query = '', categoryId = ALL_CATEGORY) {
+export function filterPhrases(phrases, query = '', categoryId = ALL_CATEGORY, favoriteIds = []) {
   const list = Array.isArray(phrases) ? phrases : [];
   const blobs = getBlobs(list);
 
-  const byCategory =
-    !categoryId || categoryId === ALL_CATEGORY
-      ? list
-      : list.filter((p) => p.category === categoryId);
+  let byCategory;
+  if (categoryId === FAVORITES_CATEGORY) {
+    const starred = new Set(favoriteIds);
+    byCategory = list.filter((p) => starred.has(p.id));
+  } else if (!categoryId || categoryId === ALL_CATEGORY) {
+    byCategory = list;
+  } else {
+    byCategory = list.filter((p) => p.category === categoryId);
+  }
 
   const tokens = normalizeArabic(query).split(' ').filter(Boolean);
   if (tokens.length === 0) return sortPhrases(byCategory);

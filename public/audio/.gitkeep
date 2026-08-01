@@ -1,0 +1,4 @@
+# Generated speech lands here in phase 4: <id>.mp3 per phrase, plus
+# _attention.mp3 for the raise-hand chime.
+# The app is fully functional with this directory empty - cards fall back to
+# speechSynthesis, and raise-hand falls back to a synthesized tone.

@@ -1,0 +1,21 @@
+node_modules
+dist
+dist-ssr
+.vercel
+*.local
+.env
+.env.*
+!.env.example
+
+# Fonts are copied out of node_modules by scripts/copy-fonts.mjs, not committed.
+public/fonts/
+
+# Raw sign-language footage (phase 4) is large; keep it out of the repo.
+raw/
+
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.idea
+.vscode

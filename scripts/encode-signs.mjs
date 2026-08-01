@@ -37,9 +37,30 @@ import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promi
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import ffmpegPath from 'ffmpeg-static';
 
 const run = promisify(execFile);
+
+/**
+ * ffmpeg-static is an OPTIONAL dependency, and the import is deliberately lazy.
+ *
+ * It ships an 80 MB binary that only this script ever uses - nothing at build
+ * or run time touches it. Making it optional lets the Vercel build skip the
+ * download entirely (see README), and the lazy import means a missing binary
+ * produces an instruction instead of a module-resolution crash.
+ */
+async function ffmpegBinary() {
+  try {
+    const mod = await import('ffmpeg-static');
+    const bin = mod.default || mod;
+    if (bin) return bin;
+  } catch {
+    /* fall through to the message below */
+  }
+  throw new Error(
+    'ffmpeg-static is not installed (it is an optional dependency).\n' +
+      '  Install it when you need to encode sign clips:  npm install'
+  );
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RAW_DIR = path.join(ROOT, 'raw');
@@ -98,6 +119,7 @@ const RECIPES = {
 };
 
 async function encode(source, dest, kind) {
+  const ffmpegPath = await ffmpegBinary();
   await run(ffmpegPath, ['-hide_banner', '-loglevel', 'error', '-y', '-i', source, ...RECIPES[kind], dest]);
 }
 
@@ -218,8 +240,6 @@ async function main() {
     console.log(await readFile(fileURLToPath(import.meta.url), 'utf8').then((s) => s.split('*/')[0]));
     return;
   }
-  if (!ffmpegPath) throw new Error('ffmpeg-static did not provide a binary - run `npm install`');
-
   if (args.cleanSample) return cleanSampleMode();
   if (args.sample) return sampleMode(args.sample, args);
   return rawMode(args);

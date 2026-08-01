@@ -78,9 +78,13 @@ which is a supported state.
 | `public/signs/<id>.mp4` | 720×720 | `SignPlayer` (phase 4) |
 | `public/signs/<id>.jpg` | first frame | the "freeze motion" setting (phase 5) |
 
-ffmpeg comes from the `ffmpeg-static` devDependency — there is nothing to install
-by hand. This script replaces the `encode-signs.sh` in SPEC section 9, which
-assumes a POSIX shell and a system ffmpeg; neither exists on Windows.
+ffmpeg comes from `ffmpeg-static`, so there is nothing to install by hand. This
+script replaces the `encode-signs.sh` in SPEC section 9, which assumes a POSIX
+shell and a system ffmpeg; neither exists on Windows.
+
+`ffmpeg-static` is an **optional** dependency on purpose: it is an 80 MB binary
+that only this script uses, and nothing at build or run time touches it. See the
+deploy section for how to keep it out of the Vercel build.
 
 ```bash
 npm run signs                              # raw/<id>.mov  ->  public/signs/<id>.*
@@ -261,15 +265,34 @@ There is deliberately **no SPA catch-all rewrite**. A catch-all would serve
 `index.html` for a missing `/audio/x.mp3`, and the whole fallback chain depends
 on that request producing an honest 404.
 
+### First deploy
+
+1. Import `Yuu-frfsh/t8dr_bootcamp` at [vercel.com/new](https://vercel.com/new).
+   Vercel detects Vite: build `npm run build`, output `dist`. `api/speak.js`
+   becomes a serverless function automatically.
+2. Add two **Environment Variables** in the project settings — `AZURE_KEY` and
+   `AZURE_REGION`. Set them in the Vercel dashboard, not in the repo: `.env` is
+   gitignored and must stay that way.
+   **Never prefix them with `VITE_`** — that would inline the key into the
+   client bundle. Without them the app still deploys and works; `api/speak.js`
+   returns 503 and free text uses the device voice.
+3. Optional but recommended: add `NPM_CONFIG_OMIT` = `optional`. That skips the
+   80 MB `ffmpeg-static` download on every build — it is only used by
+   `npm run signs`, never at build or run time. Everything still builds without
+   it; the build is just slower if you leave it off.
+
+`public/fonts/` is gitignored and repopulated by the `postinstall` hook, so the
+self-hosted font lands on Vercel without being committed.
+
 ---
 
 ## Next (phase 4)
 
 1. ~~`scripts/tts.js`~~ — done; 30 files in `public/audio`.
-2. Film the signs to the standard in SPEC section 9 — **never crop the face**;
-   eyebrows, mouth shape and head tilt are grammar, not expression.
-3. `scripts/encode-signs.sh` → `.webp` + `.mp4` + `.jpg` per id. Requires
-   ffmpeg, which is not currently installed on this machine.
+2. ~~`scripts/encode-signs.mjs`~~ — done; `.webp` + `.mp4` + `.jpg` per id.
+3. Film the signs to the standard in SPEC section 9 — **never crop the face**;
+   eyebrows, mouth shape and head tilt are grammar, not expression. Drop them in
+   `raw/<id>.mov` and run `npm run signs`; that replaces the placeholders.
 4. `SignPlayer` modal with 0.5× / 0.75× / 1× speed control.
 
 Cards pick assets up automatically as files land. No code changes needed.

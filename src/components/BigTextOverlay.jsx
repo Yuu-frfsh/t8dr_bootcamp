@@ -44,12 +44,6 @@ export default function BigTextOverlay({ overlay, onDismiss }) {
         {overlay.text_ar}
       </span>
 
-      {overlay.text_en ? (
-        <span className="text-xl opacity-80 sm:text-2xl" dir="ltr">
-          {overlay.text_en}
-        </span>
-      ) : null}
-
       {failed ? (
         <span className="mt-2 flex items-center gap-2 rounded-full bg-black/25 px-5 py-3 text-lg font-bold">
           <VolumeX size={24} aria-hidden="true" />

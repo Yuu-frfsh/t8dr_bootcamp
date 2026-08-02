@@ -85,7 +85,7 @@ All content lives here. **No phrase text may be hardcoded in any component.** Th
 |---|---|---|
 | `id` | string | `snake_case`, unique. Also the filename for `/signs/<id>.webp`, `/signs/<id>.mp4`, `/audio/<id>.mp3`. |
 | `text_ar` | string | Displayed and spoken. May include harakat for pronunciation fixes. |
-| `text_en` | string | Displayed small under the Arabic. Also used for English search. |
+| `text_en` | string | **Search only — never displayed.** Lets a Latin keyboard find a card. |
 | `category` | string | Must match an `id` in `categories.json`. |
 | `keywords` | string[] | Extra search terms, Arabic and English. Optional. |
 | `priority` | number | Lower sorts first within a category. Optional, defaults to 99. |
@@ -137,7 +137,7 @@ The core component. Whole card is one button.
 
 **Structure:**
 - Top ~65%: sign clip — `<img src="/signs/{id}.webp" loading="lazy">`. **Animated WebP, rendered as an image.** Do not use `<video>` here. No play/pause logic, no `IntersectionObserver` for playback.
-- Bottom ~35%: `text_ar` (large, bold), `text_en` (small, muted gray, below).
+- Bottom ~35%: `text_ar` (large, bold), preceded by a small category badge. **Arabic only — no English gloss.** An English line under the Arabic serves a reader who is not the user, and it costs caption height on a phone. `text_en` remains in the data for search.
 - Top-left corner (RTL): small expand icon button, `stopPropagation`, opens `SignPlayer`.
 - Bottom-left corner: small star icon for favorite, `stopPropagation`.
 

@@ -17,10 +17,16 @@ import WaveEffect from './WaveEffect.jsx';
  * "tapping the star does not speak" behaviour with no event plumbing.
  *
  * It sits over the sign area, not over the caption. Anchored to the bottom it
- * collided with the English line on every phrase long enough to wrap, and the
- * fix cannot be "shrink it until it fits" - the collision comes back the moment
+ * collided with the caption on every phrase long enough to wrap, and the fix
+ * cannot be "shrink it until it fits" - the collision comes back the moment
  * someone adds a longer phrase. The sign area is the one region of the card
  * whose height never depends on the text.
+ *
+ * The card shows Arabic ONLY. `text_en` stays in phrases.json and stays in the
+ * search blob, so a Latin keyboard still finds a card, but it is never drawn:
+ * an English gloss under an Arabic phrase is for a reader who is not the user.
+ * Free text is unaffected - it picks its voice with detectLang, so typing
+ * English there still speaks English.
  */
 /**
  * Length-based sizing, deterministic like the overlay's - no measure-and-reflow.
@@ -61,7 +67,7 @@ export default function PhraseCard({
         type="button"
         onPointerDown={() => preload(phrase.id)}
         onClick={() => speak(phrase, category)}
-        aria-label={`${phrase.text_ar}${phrase.text_en ? ` - ${phrase.text_en}` : ''}`}
+        aria-label={phrase.text_ar}
         aria-pressed={state === 'playing'}
         className={[
           'relative flex w-full flex-col overflow-hidden rounded-2xl text-start',
@@ -134,12 +140,6 @@ export default function PhraseCard({
               {phrase.text_ar}
             </span>
           </div>
-          {phrase.text_en ? (
-            <span className={`mt-1 text-muted ${isCompact ? 'text-xs' : 'text-sm'}`} dir="ltr">
-              {phrase.text_en}
-            </span>
-          ) : null}
-
           {state === 'failed' ? (
             <span className="mt-2 flex items-center gap-1.5 text-sm font-bold text-danger">
               <AlertTriangle size={18} aria-hidden="true" />

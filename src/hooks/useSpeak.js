@@ -34,8 +34,29 @@ const PRELOAD_MAX = 12;
  * error at all - measured behaviour for a 404 is `play` and `waiting` at 1ms,
  * `stalled` at ~3.3s, and `error` never. Waiting 3.3s for the fallback would be
  * three seconds of dead air on the app's default zero-assets configuration.
+ *
+ * It answers exactly one question - "is there a file here at all?" - and is
+ * cancelled the moment the file announces a duration. It must never be the
+ * thing that gives up on a file that demonstrably exists; see
+ * BUFFER_DEADLINE_MS.
  */
 const SOURCE_DEADLINE_MS = 700;
+
+/**
+ * The budget AFTER the file has proven it exists, for it to actually start.
+ *
+ * These are two different questions and they had been sharing one timer. A file
+ * that exists but is slow - a longer phrase, a cold cache, venue wifi - looked
+ * exactly like a 404 to the 700ms deadline, so the longest phrases fell to the
+ * device voice while the shorter ones played their Azure MP3. Worse, that
+ * counted as proof of absence and blacklisted the id for the rest of the
+ * session, so those cards NEVER recovered.
+ *
+ * Once `duration` is known, absence is ruled out, so waiting longer is free -
+ * the only cost of a slow file is latency, and the alternative was the wrong
+ * voice permanently.
+ */
+const BUFFER_DEADLINE_MS = 2500;
 
 /**
  * Ids whose audio file has already proven absent this session. Lets the second
@@ -43,6 +64,9 @@ const SOURCE_DEADLINE_MS = 700;
  * re-waiting the deadline, and stops the app re-requesting known 404s.
  * In-memory only: a reload re-probes, which is the right behaviour after a
  * deploy that adds the files.
+ *
+ * Only ever written on evidence of ABSENCE - never because a real file was
+ * slow. A wrong entry here is permanent for the session.
  */
 const knownMissing = new Set();
 
@@ -356,14 +380,34 @@ export function useSpeakEngine() {
         audioRef.current = audio;
 
         let phase = 'pending';
+        // Set once the file reports a duration, which only a file that exists
+        // can do. Separates "there is nothing here" from "this is taking a
+        // while", which the single deadline used to conflate.
+        let sourceConfirmed = false;
 
         const fallback = () => {
           if (!alive() || phase !== 'pending') return;
           phase = 'fell-back';
-          if (missingKey) knownMissing.add(missingKey);
+          // Blacklist on absence only. A file that announced a duration is
+          // there; it was slow, and it gets a clean chance on the next tap
+          // rather than being condemned to the device voice for the session.
+          if (missingKey && !sourceConfirmed) knownMissing.add(missingKey);
           releaseAudio();
           onFallback();
         };
+
+        // `loadedmetadata` is the proof-of-existence signal. `durationchange`
+        // is a second chance at it, because a preloaded element may already
+        // have fired `loadedmetadata` before these handlers were attached.
+        const confirmSource = () => {
+          if (!alive() || phase !== 'pending' || sourceConfirmed) return;
+          if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+          sourceConfirmed = true;
+          clearDeadline();
+          deadlineRef.current = setTimeout(fallback, BUFFER_DEADLINE_MS);
+        };
+        audio.onloadedmetadata = confirmSource;
+        audio.ondurationchange = confirmSource;
 
         // `playing`, NOT `play`. Chrome fires `play` the instant play() is
         // called - measured at 1ms even for a file that does not exist - so it
@@ -404,6 +448,12 @@ export function useSpeakEngine() {
           /* no-op */
         }
 
+        // Deliberately AFTER currentTime is reset: seeking a preloaded element
+        // can itself fire `durationchange`, and confirming here means one
+        // consistent path whether the metadata arrived before or after these
+        // handlers were attached.
+        confirmSource();
+
         let played;
         try {
           played = audio.play();
@@ -416,8 +466,15 @@ export function useSpeakEngine() {
 
         // Chrome never reports a 404 as an error and only stalls after ~3.3s.
         // Stop waiting well before that; see SOURCE_DEADLINE_MS.
-        clearDeadline();
-        deadlineRef.current = setTimeout(fallback, SOURCE_DEADLINE_MS);
+        //
+        // Only arm this if existence is still an open question. If the file
+        // already confirmed its duration it is on the longer BUFFER deadline,
+        // and re-arming the short one here would drop it straight back into the
+        // bug this pair of timers exists to fix.
+        if (!sourceConfirmed) {
+          clearDeadline();
+          deadlineRef.current = setTimeout(fallback, SOURCE_DEADLINE_MS);
+        }
       };
 
       const tryFile = () => {

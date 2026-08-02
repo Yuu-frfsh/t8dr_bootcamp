@@ -159,6 +159,21 @@ source-selection deadline, not a state timer: it can only ever *downgrade*, and
 never claims audio happened. Ids that prove absent are remembered in
 `knownMissing` so only the first tap pays that cost.
 
+**There are two deadlines, and mixing them up is a real bug that shipped once.**
+"Is there a file here?" and "is it going to start?" are different questions:
+
+| | | cancelled by |
+|---|---|---|
+| `SOURCE_DEADLINE_MS` | 700 ms | `loadedmetadata` — a duration proves the file exists |
+| `BUFFER_DEADLINE_MS` | 2500 ms | `playing` |
+
+With one timer doing both jobs, a file that existed but was slow — a long
+phrase, a cold cache, venue wifi — looked identical to a 404. The longest
+phrases fell to the device voice while short ones played their Azure MP3, and
+because a deadline miss also wrote to `knownMissing`, those cards were
+condemned to the wrong voice for the rest of the session. `knownMissing` is now
+only ever written on evidence of *absence*; a wrong entry there is permanent.
+
 **A generation token** on every speak, so a cancelled utterance's
 `interrupted` error cannot paint the *next* card red.
 

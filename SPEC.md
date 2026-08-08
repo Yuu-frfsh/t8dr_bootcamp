@@ -84,7 +84,9 @@ All content lives here. **No phrase text may be hardcoded in any component.** Th
 | Field | Type | Notes |
 |---|---|---|
 | `id` | string | `snake_case`, unique. Also the filename for `/signs/<id>.webp`, `/signs/<id>.mp4`, `/audio/<id>.mp3`. |
-| `text_ar` | string | Displayed and spoken. May include harakat for pronunciation fixes. |
+| `text_ar` | string | **Displayed.** Never carries harakat — see `speech_ar`. |
+| `speech_ar` | string | **Spoken, never displayed.** Optional. `text_ar` plus harakat, for phrases the voice mispronounces. Must differ from `text_ar` by harakat *only*, unless `speech_note` declares why; `npm run tts` fails otherwise. |
+| `speech_note` | string | Required only when `speech_ar` changes a word (e.g. a contraction read as its full form). Printed on every `npm run tts` run so the deviation stays visible. |
 | `text_en` | string | **Search only — never displayed.** Lets a Latin keyboard find a card. |
 | `category` | string | Must match an `id` in `categories.json`. |
 | `keywords` | string[] | Extra search terms, Arabic and English. Optional. |

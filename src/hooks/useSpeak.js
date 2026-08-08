@@ -310,7 +310,10 @@ export function useSpeakEngine() {
       const speakWith = (voices) => {
         if (!alive()) return;
         const synth = window.speechSynthesis;
-        const text = String(target.text_ar || '').trim();
+        // `speech`, not `text_ar`: the voiced (harakat) variant when a phrase
+        // has one. What is spoken and what is displayed are different strings
+        // on purpose - see `speech_ar` in phrases.json.
+        const text = String(target.speech || target.text_ar || '').trim();
         if (!synth || !text) return markFailed();
 
         let utterance;
@@ -535,6 +538,9 @@ export function useSpeakEngine() {
       run({
         id: phrase.id,
         text_ar: phrase.text_ar,
+        // Spoken, never displayed. Falls back to the display text, so a phrase
+        // without a pronunciation problem needs no extra field.
+        speech: phrase.speech_ar || phrase.text_ar,
         text_en: phrase.text_en,
         color: category && category.color,
         lang: 'ar-SA',
@@ -550,6 +556,7 @@ export function useSpeakEngine() {
       run({
         id: FREE_TEXT_ID,
         text_ar: trimmed,
+        speech: trimmed,
         text_en: '',
         // Free text has no category, so it wears the brand colour.
         color: '#7D63AB',

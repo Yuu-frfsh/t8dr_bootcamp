@@ -4,7 +4,13 @@
     "text_ar": "عندي سؤال",
     "text_en": "I have a question",
     "category": "help",
-    "keywords": ["سؤال", "أسأل", "استفسار", "question", "ask"],
+    "keywords": [
+      "سؤال",
+      "أسأل",
+      "استفسار",
+      "question",
+      "ask"
+    ],
     "priority": 1
   },
   {
@@ -12,40 +18,87 @@
     "text_ar": "أنا واجهتني مشكلة في هالخطوة",
     "text_en": "I ran into a problem on this step",
     "category": "help",
-    "keywords": ["مشكلة", "خطوة", "هذه الخطوة", "علقت", "problem", "stuck", "step"],
-    "priority": 2
+    "keywords": [
+      "مشكلة",
+      "خطوة",
+      "هذه الخطوة",
+      "علقت",
+      "problem",
+      "stuck",
+      "step"
+    ],
+    "priority": 2,
+    "speech_ar": "أنا واجهتني مشكلة في هَالْخَطْوَة"
   },
   {
     "id": "help_find_mistake",
     "text_ar": "ممكن تساعدني أعرف وين الغلط؟",
     "text_en": "Can you help me find the mistake?",
     "category": "help",
-    "keywords": ["غلط", "خطأ", "ساعدني", "مساعدة", "أين", "mistake", "error", "help"],
-    "priority": 3
+    "keywords": [
+      "غلط",
+      "خطأ",
+      "ساعدني",
+      "مساعدة",
+      "أين",
+      "mistake",
+      "error",
+      "help"
+    ],
+    "priority": 3,
+    "speech_ar": "مُمْكِنْ تساعدني أعرف وين الغلط؟"
   },
   {
     "id": "tried_didnt_work",
     "text_ar": "أنا جربت الطريقة بس ما ضبطت معي",
     "text_en": "I tried the method but it didn't work",
     "category": "help",
-    "keywords": ["جربت", "ما ضبطت", "ما اشتغلت", "الطريقة", "فشلت", "tried", "not working", "failed"],
-    "priority": 4
+    "keywords": [
+      "جربت",
+      "ما ضبطت",
+      "ما اشتغلت",
+      "الطريقة",
+      "فشلت",
+      "tried",
+      "not working",
+      "failed"
+    ],
+    "priority": 4,
+    "speech_ar": "أنا جَرَّبْت الطريقة بس ما ضبطت معي"
   },
   {
     "id": "check_if_correct",
     "text_ar": "ممكن تشوف إذا أنا سويتها صح؟",
     "text_en": "Can you check if I did it right?",
     "category": "help",
-    "keywords": ["صح", "تشوف", "راجع", "سويتها", "عملتها", "check", "correct", "review"],
-    "priority": 5
+    "keywords": [
+      "صح",
+      "تشوف",
+      "راجع",
+      "سويتها",
+      "عملتها",
+      "check",
+      "correct",
+      "review"
+    ],
+    "priority": 5,
+    "speech_ar": "مُمْكِنْ تشوف إذا أنا سَوَّيْتها صح؟"
   },
-
   {
     "id": "didnt_understand",
     "text_ar": "أستاذ ما فهمت",
     "text_en": "Teacher, I didn't understand",
     "category": "understand",
-    "keywords": ["ما فهمت", "مافهمت", "لم أفهم", "أستاذ", "معلم", "understand", "confused", "teacher"],
+    "keywords": [
+      "ما فهمت",
+      "مافهمت",
+      "لم أفهم",
+      "أستاذ",
+      "معلم",
+      "understand",
+      "confused",
+      "teacher"
+    ],
     "priority": 1
   },
   {
@@ -53,63 +106,130 @@
     "text_ar": "هل ممكن تعيد؟",
     "text_en": "Can you repeat that?",
     "category": "understand",
-    "keywords": ["تعيد", "أعد", "كرر", "مرة ثانية", "repeat", "again"],
-    "priority": 2
+    "keywords": [
+      "تعيد",
+      "أعد",
+      "كرر",
+      "مرة ثانية",
+      "repeat",
+      "again"
+    ],
+    "priority": 2,
+    "speech_ar": "هل مُمْكِنْ تعيد؟"
   },
   {
     "id": "explain_again",
     "text_ar": "هل ممكن تشرح مرة ثانية؟",
     "text_en": "Can you explain it again?",
     "category": "understand",
-    "keywords": ["تشرح", "شرح", "مرة ثانية", "مرة أخرى", "explain", "again"],
-    "priority": 3
+    "keywords": [
+      "تشرح",
+      "شرح",
+      "مرة ثانية",
+      "مرة أخرى",
+      "explain",
+      "again"
+    ],
+    "priority": 3,
+    "speech_ar": "هل مُمْكِنْ تشرح مرة ثانية؟"
   },
   {
     "id": "pause_on_point",
     "text_ar": "ممكن توقف شوي عند هالنقطة؟",
     "text_en": "Can you pause on this point?",
     "category": "understand",
-    "keywords": ["توقف", "وقف", "النقطة", "شوي", "قليلا", "pause", "stop", "point"],
-    "priority": 4
+    "keywords": [
+      "توقف",
+      "وقف",
+      "النقطة",
+      "شوي",
+      "قليلا",
+      "pause",
+      "stop",
+      "point"
+    ],
+    "priority": 4,
+    "speech_ar": "مُمْكِنْ توقف شِوَيّ عند هَالنُّقْطَة؟"
   },
   {
     "id": "previous_slide",
     "text_ar": "ممكن ترجع للشريحة اللي قبل؟",
     "text_en": "Can you go back to the previous slide?",
     "category": "understand",
-    "keywords": ["شريحة", "سلايد", "ترجع", "السابقة", "قبل", "slide", "back", "previous"],
-    "priority": 5
+    "keywords": [
+      "شريحة",
+      "سلايد",
+      "ترجع",
+      "السابقة",
+      "قبل",
+      "slide",
+      "back",
+      "previous"
+    ],
+    "priority": 5,
+    "speech_ar": "مُمْكِنْ ترجع للشريحة اللي قبل؟"
   },
   {
     "id": "give_example",
     "text_ar": "ممكن تعطينا مثال على هالموضوع؟",
     "text_en": "Can you give us an example of this?",
     "category": "understand",
-    "keywords": ["مثال", "أمثلة", "الموضوع", "هذا الموضوع", "example", "topic"],
-    "priority": 6
+    "keywords": [
+      "مثال",
+      "أمثلة",
+      "الموضوع",
+      "هذا الموضوع",
+      "example",
+      "topic"
+    ],
+    "priority": 6,
+    "speech_ar": "مُمْكِنْ تعطينا مثال على هَالْمَوْضُوعْ؟"
   },
   {
     "id": "repeat_example",
     "text_ar": "ممكن تعيد المثال؟",
     "text_en": "Can you repeat the example?",
     "category": "understand",
-    "keywords": ["مثال", "تعيد", "كرر", "example", "repeat"],
-    "priority": 7
+    "keywords": [
+      "مثال",
+      "تعيد",
+      "كرر",
+      "example",
+      "repeat"
+    ],
+    "priority": 7,
+    "speech_ar": "مُمْكِنْ تعيد المثال؟"
   },
   {
     "id": "real_world_example",
     "text_ar": "ممكن تعطينا مثال من واقع العمل؟",
     "text_en": "Can you give a real-world example?",
     "category": "understand",
-    "keywords": ["مثال", "واقع", "العمل", "عملي", "تطبيقي", "example", "real world", "practical"],
-    "priority": 8
+    "keywords": [
+      "مثال",
+      "واقع",
+      "العمل",
+      "عملي",
+      "تطبيقي",
+      "example",
+      "real world",
+      "practical"
+    ],
+    "priority": 8,
+    "speech_ar": "مُمْكِنْ تعطينا مثال من واقع العمل؟"
   },
   {
     "id": "this_is_clear",
     "text_ar": "هذا واضح",
     "text_en": "This is clear",
     "category": "understand",
-    "keywords": ["واضح", "فهمت", "تمام", "clear", "understood"],
+    "keywords": [
+      "واضح",
+      "فهمت",
+      "تمام",
+      "clear",
+      "understood"
+    ],
     "priority": 9
   },
   {
@@ -117,16 +237,34 @@
     "text_ar": "أعتقد إني فهمت، بس خلني أجرب",
     "text_en": "I think I got it, let me try",
     "category": "understand",
-    "keywords": ["فهمت", "أجرب", "جرب", "خلني", "أعتقد", "understood", "try"],
-    "priority": 10
+    "keywords": [
+      "فهمت",
+      "أجرب",
+      "جرب",
+      "خلني",
+      "أعتقد",
+      "understood",
+      "try"
+    ],
+    "priority": 10,
+    "speech_ar": "أعتقد إني فهمت، بس خلني أَجَرِّبْ"
   },
-
   {
     "id": "finished_assembly",
     "text_ar": "انتهينا من التركيب",
     "text_en": "We finished the assembly",
     "category": "tech",
-    "keywords": ["انتهينا", "خلصنا", "التركيب", "ركبنا", "روبوت", "finished", "assembly", "done", "robot"],
+    "keywords": [
+      "انتهينا",
+      "خلصنا",
+      "التركيب",
+      "ركبنا",
+      "روبوت",
+      "finished",
+      "assembly",
+      "done",
+      "robot"
+    ],
     "priority": 1
   },
   {
@@ -134,15 +272,32 @@
     "text_ar": "هل نقدر نجربها الحين؟",
     "text_en": "Can we try it now?",
     "category": "tech",
-    "keywords": ["نجرب", "تجربة", "الحين", "الآن", "try", "now", "test"],
-    "priority": 2
+    "keywords": [
+      "نجرب",
+      "تجربة",
+      "الحين",
+      "الآن",
+      "try",
+      "now",
+      "test"
+    ],
+    "priority": 2,
+    "speech_ar": "هل نِقْدَرْ نِجَرِّبْها الحين؟"
   },
   {
     "id": "is_result_correct",
     "text_ar": "هل المفروض تطلع لي النتيجة كذا؟",
     "text_en": "Is this the result I should be getting?",
     "category": "tech",
-    "keywords": ["النتيجة", "المفروض", "تطلع", "صح", "result", "output", "correct"],
+    "keywords": [
+      "النتيجة",
+      "المفروض",
+      "تطلع",
+      "صح",
+      "result",
+      "output",
+      "correct"
+    ],
     "priority": 3
   },
   {
@@ -150,32 +305,69 @@
     "text_ar": "طيب، وش الخطوة اللي بعدها؟",
     "text_en": "OK, what's the next step?",
     "category": "tech",
-    "keywords": ["الخطوة", "بعدها", "التالية", "وش", "ماذا", "next", "step"],
-    "priority": 4
+    "keywords": [
+      "الخطوة",
+      "بعدها",
+      "التالية",
+      "وش",
+      "ماذا",
+      "next",
+      "step"
+    ],
+    "priority": 4,
+    "speech_ar": "طيب، وِش الخطوة اللي بعدها؟"
   },
   {
     "id": "common_mistake",
     "text_ar": "وش أكثر خطأ ممكن نقع فيه؟",
     "text_en": "What's the most common mistake?",
     "category": "tech",
-    "keywords": ["خطأ", "أخطاء", "غلط", "نقع", "أكثر", "mistake", "error", "common"],
-    "priority": 5
+    "keywords": [
+      "خطأ",
+      "أخطاء",
+      "غلط",
+      "نقع",
+      "أكثر",
+      "mistake",
+      "error",
+      "common"
+    ],
+    "priority": 5,
+    "speech_ar": "وِش أكثر خطأ مُمْكِنْ نقع فِيهْ؟"
   },
   {
     "id": "easier_way",
     "text_ar": "هل فيه طريقة أسهل نسوي فيها هالشي؟",
     "text_en": "Is there an easier way to do this?",
     "category": "tech",
-    "keywords": ["أسهل", "طريقة", "أسرع", "بديل", "نسوي", "easier", "way", "simpler"],
-    "priority": 6
+    "keywords": [
+      "أسهل",
+      "طريقة",
+      "أسرع",
+      "بديل",
+      "نسوي",
+      "easier",
+      "way",
+      "simpler"
+    ],
+    "priority": 6,
+    "speech_ar": "هل فِيهْ طريقة أسهلْ نِسَوِّي فِيها هذا الشيء؟",
+    "speech_note": "هالشي -> هذا الشيء: the contraction is mispronounced; the expanded form is the same words"
   },
-
   {
     "id": "when_is_break",
     "text_ar": "متى وقت الاستراحة؟",
     "text_en": "When is the break?",
     "category": "needs",
-    "keywords": ["استراحة", "راحة", "متى", "بريك", "break", "when", "rest"],
+    "keywords": [
+      "استراحة",
+      "راحة",
+      "متى",
+      "بريك",
+      "break",
+      "when",
+      "rest"
+    ],
     "priority": 1
   },
   {
@@ -183,56 +375,118 @@
     "text_ar": "ممكن تعطينا وقت نجرب بأنفسنا؟",
     "text_en": "Can you give us time to try it ourselves?",
     "category": "needs",
-    "keywords": ["وقت", "نجرب", "بأنفسنا", "تطبيق", "time", "practice", "try"],
-    "priority": 2
+    "keywords": [
+      "وقت",
+      "نجرب",
+      "بأنفسنا",
+      "تطبيق",
+      "time",
+      "practice",
+      "try"
+    ],
+    "priority": 2,
+    "speech_ar": "مُمْكِنْ تعطينا وقت نِجَرِّبْ بأنفسنا؟"
   },
   {
     "id": "time_limit_exercise",
     "text_ar": "هل فيه وقت محدد للتطبيق؟",
     "text_en": "Is there a time limit for the exercise?",
     "category": "needs",
-    "keywords": ["وقت", "محدد", "التطبيق", "تمرين", "time", "limit", "exercise"],
-    "priority": 3
+    "keywords": [
+      "وقت",
+      "محدد",
+      "التطبيق",
+      "تمرين",
+      "time",
+      "limit",
+      "exercise"
+    ],
+    "priority": 3,
+    "speech_ar": "هل فِيهْ وقت محدد للتطبيق؟"
   },
   {
     "id": "send_material",
     "text_ar": "ممكن ترسل لنا المادة التدريبية؟",
     "text_en": "Can you send us the training material?",
     "category": "needs",
-    "keywords": ["ترسل", "المادة", "التدريبية", "ملف", "شرائح", "send", "material", "slides"],
-    "priority": 4
+    "keywords": [
+      "ترسل",
+      "المادة",
+      "التدريبية",
+      "ملف",
+      "شرائح",
+      "send",
+      "material",
+      "slides"
+    ],
+    "priority": 4,
+    "speech_ar": "مُمْكِنْ ترسل لنا المادة التدريبية؟"
   },
   {
     "id": "recommended_resources",
     "text_ar": "هل فيه مصادر تنصحنا نقرأها؟",
     "text_en": "Are there resources you'd recommend?",
     "category": "needs",
-    "keywords": ["مصادر", "مراجع", "تنصح", "نقرأ", "كتب", "resources", "reading", "recommend"],
-    "priority": 5
+    "keywords": [
+      "مصادر",
+      "مراجع",
+      "تنصح",
+      "نقرأ",
+      "كتب",
+      "resources",
+      "reading",
+      "recommend"
+    ],
+    "priority": 5,
+    "speech_ar": "هل فِيهْ مصادر تنصحنا نقرأها؟"
   },
-
   {
     "id": "work_as_group",
     "text_ar": "نقدر نشتغل عليها كمجموعة؟",
     "text_en": "Can we work on it as a group?",
     "category": "social",
-    "keywords": ["مجموعة", "جماعي", "نشتغل", "فريق", "group", "team", "together"],
-    "priority": 1
+    "keywords": [
+      "مجموعة",
+      "جماعي",
+      "نشتغل",
+      "فريق",
+      "group",
+      "team",
+      "together"
+    ],
+    "priority": 1,
+    "speech_ar": "نِقْدَرْ نشتغل عليها كمجموعة؟"
   },
   {
     "id": "thank_you_effort",
     "text_ar": "شكرا لجهودك",
     "text_en": "Thank you for your effort",
     "category": "social",
-    "keywords": ["شكرا", "جهودك", "مشكور", "thanks", "thank you", "effort"],
-    "priority": 2
+    "keywords": [
+      "شكرا",
+      "جهودك",
+      "مشكور",
+      "thanks",
+      "thank you",
+      "effort"
+    ],
+    "priority": 2,
+    "speech_ar": "شكراً لجهودك"
   },
   {
     "id": "benefited_from_workshop",
     "text_ar": "يعطيك العافية، استفدنا كثير من الورشة",
     "text_en": "Thank you, we learned a lot from the workshop",
     "category": "social",
-    "keywords": ["يعطيك العافية", "استفدنا", "الورشة", "شكرا", "thanks", "workshop", "learned"],
+    "keywords": [
+      "يعطيك العافية",
+      "استفدنا",
+      "الورشة",
+      "شكرا",
+      "thanks",
+      "workshop",
+      "learned"
+    ],
     "priority": 3
   },
   {
@@ -240,7 +494,15 @@
     "text_ar": "صناعة الروبوت سهلة مع هذه الدورة",
     "text_en": "Building robots is easy with this course",
     "category": "social",
-    "keywords": ["روبوت", "سهلة", "الدورة", "صناعة", "robot", "easy", "course"],
+    "keywords": [
+      "روبوت",
+      "سهلة",
+      "الدورة",
+      "صناعة",
+      "robot",
+      "easy",
+      "course"
+    ],
     "priority": 4
   }
 ]

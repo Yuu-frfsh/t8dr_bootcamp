@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Star, AlertTriangle } from 'lucide-react';
+import signVersions from '../data/signs.json';
 import { useSpeak } from '../hooks/useSpeak.js';
 import { iconFor } from '../utils/icons.js';
 import { hexToRgba, readableTextOn } from '../utils/color.js';
@@ -58,6 +59,18 @@ export default function PhraseCard({
   const isCompact = size === 'sm';
   const showFavorite = !isCompact && typeof onToggleFavorite === 'function';
 
+  /**
+   * Content hash from src/data/signs.json, written by scripts/encode-signs.mjs.
+   *
+   * /signs is served `immutable, max-age=31536000`, which is a promise that a
+   * URL's bytes never change - and these filenames are reused every time a sign
+   * is re-encoded. Re-filming therefore stranded every returning browser on the
+   * clip it had cached. The hash makes the URL change with the content, so the
+   * cache header stops being a lie. Absent (a clip encoded before this existed)
+   * simply means no query string, never a broken src.
+   */
+  const signQuery = signVersions[phrase.id] ? `?v=${signVersions[phrase.id]}` : '';
+
   const borderColor = state === 'failed' ? '#DC2626' : state === 'playing' ? color : '#D4D4D8';
   const textStyle = textStyleFor(phrase.text_ar, isCompact);
 
@@ -81,11 +94,31 @@ export default function PhraseCard({
         }}
       >
         {/* Fixed aspect ratio reserves the space, so the grid never reflows
-            when a sign clip finishes loading (acceptance check 9). */}
-        <div className="relative w-full shrink-0 overflow-hidden bg-surface aspect-square">
+            when a sign clip finishes loading (acceptance check 9).
+
+            The .jpg poster rides underneath as a CSS background. It is the
+            FIRST FRAME of the same clip at ~4kB against the WebP's ~189kB, so
+            all 30 cards paint a signer almost immediately and the animation
+            fills in behind them. Without it the grid is 5.3MB of WebP arriving
+            one card at a time, which reads as a broken page.
+
+            No cross-fade on purpose: the poster is literally frame 1, so when
+            the WebP takes over it starts from the picture already on screen. */}
+        <div
+          className="relative w-full shrink-0 overflow-hidden bg-surface aspect-square"
+          style={
+            signFailed
+              ? undefined
+              : {
+                  backgroundImage: `url('/signs/${phrase.id}.jpg${signQuery}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+          }
+        >
           {!signFailed ? (
             <img
-              src={`/signs/${phrase.id}.webp`}
+              src={`/signs/${phrase.id}.webp${signQuery}`}
               alt=""
               loading="lazy"
               decoding="async"

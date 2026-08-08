@@ -99,6 +99,24 @@ npm run signs -- --force                   # re-encode instead of skipping
 Filename in `raw/` **is** the phrase id. Encoding is idempotent, so re-running
 after filming three more signs only encodes those three.
 
+### Why the `?v=` on sign URLs
+
+`vercel.json` serves `/signs` as `immutable, max-age=31536000` — a promise that
+a URL's bytes never change. But the filenames are reused: re-filming a sign
+rewrites `have_question.webp` in place. That combination stranded every
+returning browser on the clip it had already cached, for a year, without even
+revalidating — the new clips were live on the server and unreachable.
+
+So the encoder writes `src/data/signs.json` (id → content hash) and `PhraseCard`
+appends it as `?v=`. The URL now changes exactly when the bytes do, which is
+what `immutable` requires, and only re-encoded ids bust. **Anything that writes
+into `public/signs` must re-run `npm run signs` so those hashes stay true.**
+
+The card also paints `<id>.jpg` as a CSS background under the animated WebP.
+It is the first frame of the same clip at ~4kB against ~189kB, so all 30 cards
+show a signer immediately instead of the grid filling in one card at a time
+over 5.3MB. No cross-fade: the poster *is* frame 1, so the handover is invisible.
+
 ### Filling every card with one placeholder clip
 
 Before the real signs are filmed, one sample clip can stand in everywhere, so the

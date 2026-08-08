@@ -32,6 +32,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { promisify } from 'node:util';
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -66,6 +67,21 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RAW_DIR = path.join(ROOT, 'raw');
 const OUT_DIR = path.join(ROOT, 'public', 'signs');
 const PHRASES = path.join(ROOT, 'src', 'data', 'phrases.json');
+
+/**
+ * id -> short content hash, imported by PhraseCard and appended as `?v=`.
+ *
+ * vercel.json serves /signs with `immutable, max-age=31536000`, which is only
+ * safe for a URL whose content can never change. These filenames are stable and
+ * their content is NOT: re-filming a sign rewrites have_question.webp in place.
+ * Every browser that loaded the placeholder set therefore had it pinned for a
+ * year, and `immutable` means it would not even revalidate - the new clips were
+ * on the server and unreachable.
+ *
+ * Hashing the bytes into the query string makes the URL change whenever the
+ * clip does, which is what `immutable` requires. Only re-encoded ids bust.
+ */
+const VERSIONS = path.join(ROOT, 'src', 'data', 'signs.json');
 
 /**
  * Written by --sample, read by --clean-sample. Lives beside the output so it
@@ -135,6 +151,33 @@ async function encodeAll(source, id, { force, into = OUT_DIR }) {
   return written;
 }
 
+/* -------------------------------------------------------------- versions */
+
+/**
+ * Rebuild src/data/signs.json from whatever is on disk right now.
+ *
+ * Derived from the files rather than accumulated as we go, so it cannot drift:
+ * every mode below just calls this last, including --clean-sample, and the
+ * answer is always "what is actually there".
+ */
+async function writeVersions() {
+  let files = [];
+  try {
+    files = (await readdir(OUT_DIR)).filter((f) => f.endsWith('.webp'));
+  } catch {
+    /* no output directory yet */
+  }
+
+  const versions = {};
+  for (const file of files.sort()) {
+    const bytes = await readFile(path.join(OUT_DIR, file));
+    versions[path.basename(file, '.webp')] = createHash('sha1').update(bytes).digest('hex').slice(0, 8);
+  }
+
+  await writeFile(VERSIONS, `${JSON.stringify(versions, null, 2)}\n`);
+  return Object.keys(versions).length;
+}
+
 /* -------------------------------------------------------------- manifest */
 
 async function readManifest() {
@@ -189,6 +232,7 @@ async function sampleMode(sampleFile, { force, only }) {
   const files = [...new Set([...previous, ...written])].sort();
   await writeFile(MANIFEST, `${JSON.stringify({ source: path.basename(source), files }, null, 2)}\n`);
 
+  console.log(`${await writeVersions()} sign version(s) recorded`);
   console.log(`\nplaceholder signs written for ${ids.length} phrase(s): ${written.length} file(s)`);
   if (skipped) console.log(`${skipped} real file(s) left untouched (use --force to overwrite)`);
   console.log(`\nundo with:  node scripts/encode-signs.mjs --clean-sample`);
@@ -200,6 +244,7 @@ async function cleanSampleMode() {
 
   for (const rel of files) await rm(path.join(OUT_DIR, rel), { force: true });
   await rm(MANIFEST, { force: true });
+  await writeVersions();
   console.log(`removed ${files.length} placeholder file(s)`);
 }
 
@@ -230,6 +275,7 @@ async function rawMode({ force, only }) {
     }
   }
   console.log(encoded ? `\nencoded ${encoded} clip(s)` : '\nnothing to do - all outputs already exist (--force to redo)');
+  console.log(`${await writeVersions()} sign version(s) recorded`);
 }
 
 /* ------------------------------------------------------------------ main */

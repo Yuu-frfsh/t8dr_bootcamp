@@ -266,15 +266,39 @@ export function useSpeakEngine() {
       clearDismiss();
       stopAll();
 
-      // Text first, synchronously, before any audio is attempted.
-      // It is the guaranteed channel; it must never wait on the speaker.
-      setOverlay({
+      const overlayFor = (status) => ({
         id: target.id,
         text_ar: target.text_ar,
         text_en: target.text_en || '',
         color: target.color || '#7D63AB',
-        status: 'idle',
+        status,
       });
+
+      /**
+       * Free text raises the overlay on every speak; a card only raises it when
+       * something goes wrong.
+       *
+       * The overlay exists because the user cannot hear the output, so a speak
+       * needs visual confirmation (principle 2) and the text has to survive a
+       * silent failure (principle 3). A card already satisfies the first half
+       * by itself - it lights up, scales its text and runs the wave - so the
+       * full-screen takeover was only carrying the failure case, at the cost of
+       * hiding the grid on every successful tap. Free text has no card to
+       * animate, so for it the overlay IS the confirmation.
+       *
+       * Failure still takes over the screen from either path. See markFailed.
+       */
+      const overlayOnSpeak = target.id === FREE_TEXT_ID;
+
+      // Text first, synchronously, before any audio is attempted.
+      // It is the guaranteed channel; it must never wait on the speaker.
+      //
+      // The else-branch matters: a card tap used to REPLACE the overlay every
+      // time, so a failed one could never outlive the next speak. Now that a
+      // card raises none on success, it has to clear the old one explicitly or
+      // a stale red overlay from a previous failure would sit over the grid.
+      if (overlayOnSpeak) setOverlay(overlayFor('idle'));
+      else setOverlay(null);
       setActiveId(target.id);
       setStatus('idle');
 
@@ -302,7 +326,12 @@ export function useSpeakEngine() {
         // No dismiss timer: with no sound, the text is the only channel left,
         // so it stays until the user taps it away. The card also stays red
         // until the next speak, so the user can see WHICH phrase failed.
-        setOverlay((o) => (o ? { ...o, status: 'failed' } : o));
+        //
+        // RAISES the overlay rather than only updating it. A card tap does not
+        // open one on success, so on failure there is nothing here to update -
+        // and this is the exact case the overlay was built for: the sound did
+        // not happen and the user has no way to hear that.
+        setOverlay((o) => (o ? { ...o, status: 'failed' } : overlayFor('failed')));
       };
 
       /* ---- step 2: speechSynthesis ---- */

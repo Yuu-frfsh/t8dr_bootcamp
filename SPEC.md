@@ -163,7 +163,14 @@ Concentric arcs emanating upward from the bottom edge of the card, like a radio 
 
 ### `BigTextOverlay`
 
-Fires on every speak action, presets and free text alike.
+Fires on **free text always**, and on a **card only when audio fails**.
+
+A card is its own confirmation — it lights up, scales its text and runs the
+wave — so taking over the screen on every successful tap only hid the grid,
+and the sign clips are the point of that grid. Free text has no card to
+animate, so there the overlay *is* the confirmation. Failure takes over the
+screen from either path, because that is the case the overlay exists for:
+the sound did not happen and the user cannot hear that it did not.
 
 - Full-screen overlay, category color background, `text_ar` in the largest type that fits (auto-shrink for long phrases), white text, centered.
 - Dismisses on tap, or automatically ~1.5s after audio ends.

@@ -431,6 +431,13 @@ fontFamily: {
 - Category colors come from `categories.json`, not from Tailwind config, so they can be edited without a rebuild.
 - Base font size 18px, phrase text on cards 24px+, `BigTextOverlay` 64px+.
 - Minimum touch target 88px. Minimum gap between tappable elements 16px.
+  - **Exception: the filter chips and the two clear (✕) buttons.** These sit in
+    the sticky header, and a row of 88px pills eats the fold that the cards need
+    — the header already collapses its free-text bar on scroll for the same
+    reason. Chips are 48px, and **48 is a floor, not a preference**: WCAG 2.5.5
+    puts the minimum target at 44×44. Do not shrink them further. The rule still
+    holds without exception for anything that speaks — cards, the speak button,
+    raise-hand.
 - No thin fonts, no low-contrast gray-on-gray, no hover-only affordances (touch devices have no hover).
 
 ---

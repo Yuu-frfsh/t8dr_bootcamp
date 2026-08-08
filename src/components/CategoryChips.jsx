@@ -23,7 +23,7 @@ export default function CategoryChips({ categories, active, onChange, hasFavorit
 
   return (
     <div
-      className="no-scrollbar flex gap-3 overflow-x-auto px-4 py-3"
+      className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-2"
       role="group"
       aria-label="تصفية حسب الفئة"
     >
@@ -36,9 +36,19 @@ export default function CategoryChips({ categories, active, onChange, hasFavorit
             type="button"
             onClick={() => onChange(chip.id)}
             aria-pressed={selected}
-            className="flex shrink-0 items-center gap-2 rounded-full border-2 px-5 text-lg font-bold transition-transform active:scale-95"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3.5 text-base font-bold transition-transform active:scale-95"
             style={{
-              minHeight: '56px',
+              /**
+               * 48px, and no lower.
+               *
+               * SPEC section 11 asks for 88px touch targets, which these chips
+               * already did not meet - that rule is written for the cards, and
+               * a row of 88px pills would eat the fold this change exists to
+               * give back. But 48 is a floor, not a preference: WCAG 2.5.5 puts
+               * the minimum target at 44x44, and a filter you keep missing is
+               * worse than one that takes an extra line.
+               */
+              minHeight: '48px',
               borderColor: chip.color,
               backgroundColor: selected ? chip.color : '#FFFFFF',
               color: selected ? readableTextOn(chip.color) : chip.color,

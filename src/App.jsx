@@ -4,6 +4,7 @@ import categories from './data/categories.json';
 import { SpeakProvider } from './context/SpeakContext.jsx';
 import { useSpeak, FREE_TEXT_ID } from './hooks/useSpeak.js';
 import { useRecents, resolveIds } from './hooks/useRecents.js';
+import { useHideOnScroll } from './hooks/useHideOnScroll.js';
 import { filterPhrases, ALL_CATEGORY, FAVORITES_CATEGORY } from './utils/searchIndex.js';
 import BrandHeader from './components/BrandHeader.jsx';
 import TopBar from './components/TopBar.jsx';
@@ -48,6 +49,7 @@ function Screen() {
     [query, activeCategory, favorites]
   );
 
+  const hideTopBar = useHideOnScroll();
   const searching = query.trim().length > 0;
   const filteringFavorites = activeCategory === FAVORITES_CATEGORY;
   const recentPhrases = useMemo(() => resolveIds(recents, byId), [recents]);
@@ -63,7 +65,33 @@ function Screen() {
       <BrandHeader />
 
       <header className="sticky top-0 z-40 bg-bg shadow-sm">
-        <TopBar />
+        {/* Collapses on scroll down, returns on scroll up. The chips and the
+            search stay pinned - those are what you scroll for.
+
+            Height is animated with grid-rows 1fr/0fr rather than a max-height
+            guess, so it collapses to exactly the bar's own height whatever that
+            turns out to be. TopBar stays MOUNTED: free text now survives a
+            speak, and unmounting it here would throw away a typed sentence the
+            moment the user scrolled.
+
+            `visibility` (not `display`) takes it out of the tab order and the
+            accessibility tree once shut. The transition delay is what makes it
+            wait for the collapse to finish, while re-opening is instant. */}
+        <div
+          className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+            hideTopBar ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'
+          }`}
+        >
+          <div
+            className="overflow-hidden"
+            style={{
+              visibility: hideTopBar ? 'hidden' : 'visible',
+              transition: `visibility 0s linear ${hideTopBar ? '200ms' : '0s'}`,
+            }}
+          >
+            <TopBar />
+          </div>
+        </div>
         <CategoryChips
           categories={categories}
           active={activeCategory}

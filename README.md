@@ -19,13 +19,17 @@ Phases 1–3 of SPEC section 12 are built:
 | 1 | Core — cards, `useSpeak`, `BigTextOverlay`, `WaveEffect` | ✅ |
 | 2 | Navigation — chips, search, recents, favorites | ✅ |
 | 3 | Free text + raise hand + `api/speak.js` | ✅ |
-| 4 | Assets — `scripts/encode-signs.mjs` ✅, `scripts/tts.js` ✅, sign filming ⬜, `SignPlayer` ⬜ | 🟨 |
+| 4 | Assets — `scripts/encode-signs.mjs` ✅, `scripts/tts.js` ✅, sign filming ✅, `SignPlayer` ⬜ | 🟨 |
 | 5 | Polish — PWA, `SettingsSheet`, Vercel deploy | ⬜ not started |
 
-Audio is real: 30 Azure-generated MP3s ship in `public/audio`. Signs are not —
-the clips currently in `public/signs` are one sample repeated, so **every card
-shows the same sign**. Film them, or run `--clean-sample`, before this goes in
-front of a participant.
+Audio and signs are both real: 30 Azure-generated MP3s in `public/audio`, and
+30 filmed sign clips in `public/signs` — one per phrase, `.webp` + `.mp4` +
+`.jpg` each. The placeholder set that used to repeat one clip across every card
+is gone.
+
+Source footage lives in `raw/<id>.mp4` and is **gitignored** — 110 MB of it.
+Keep the originals somewhere outside the repo; `public/signs` is the derived,
+committed artifact and can always be rebuilt with `npm run signs -- --force`.
 
 The app is **fully usable with zero sign clips and zero audio files.** That is a
 designed state, not a placeholder — see principle 5 in the spec.
@@ -197,12 +201,53 @@ Current content is **30 real bootcamp phrases**. Colloquial spellings are on the
 cards (`الحين`, `وش`, `هالنقطة`) with MSA equivalents in `keywords`, so search
 finds a card either way.
 
-After editing wording, re-run `npm run tts -- --force` — otherwise the card still
-plays the MP3 of the old sentence.
+After editing wording, re-run `npm run tts`. It records the exact string behind
+every MP3 in `public/audio/.tts-manifest.json` and regenerates only what
+actually changed, so `--force` is for when you want to re-synthesise regardless.
+
+### Fixing a mispronunciation
+
+Do not add harakat by default — generate the audio plain, listen once, and fix
+only the few that come out wrong. When one does, add `speech_ar`:
+
+```json
+{
+  "id": "have_question",
+  "text_ar": "عندي سؤال",
+  "speech_ar": "عِنْدِي سُؤَال"
+}
+```
+
+`text_ar` is what the card shows, `speech_ar` is what the voice says, and the
+harakat never reach the screen. Both the pre-generated MP3 and the
+`speechSynthesis` fallback use `speech_ar` when it is present, so the two paths
+cannot pronounce the phrase differently.
+
+**`speech_ar` must differ from `text_ar` by harakat and nothing else.** It is
+the one field nobody proofreads, because it never appears on screen — a typo
+there means a card that displays one sentence and says another, to a user who
+cannot hear the difference. `npm run tts` compares the two with the harakat
+stripped and refuses to generate anything if a word changed.
+
+Some genuine fixes *are* word changes, though — a colloquial contraction the
+voice mangles, read as its full form. Declare those with `speech_note`:
+
+```json
+{
+  "id": "easier_way",
+  "text_ar": "هل فيه طريقة أسهل نسوي فيها هالشي؟",
+  "speech_ar": "هل فِيهْ طريقة أسهلْ نِسَوِّي فِيها هذا الشيء؟",
+  "speech_note": "هالشي -> هذا الشيء: the contraction is mispronounced; the expanded form is the same words"
+}
+```
+
+The note costs one deliberate sentence and `npm run tts` prints every declared
+rewrite on every run, so none of them quietly become permanent. Without the
+note it is still a hard failure — the point is that a card saying something it
+does not show must always be a decision, never an accident.
 
 When you extend the list: transliterate technical terms into Arabic script
-(`الأردوينو`, not `Arduino`), and do not add harakat by default — generate the
-audio plain, listen once, and add harakat only to the few that come out wrong.
+(`الأردوينو`, not `Arduino`).
 
 ---
 
